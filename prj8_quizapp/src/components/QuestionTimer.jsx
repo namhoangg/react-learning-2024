@@ -1,9 +1,5 @@
 import { useState, useEffect } from "react";
 export default function Timer({ timeout, onTimeout }) {
- 
-  useEffect(()=>{
-    console.log("Timer component mounted");
-  },[])
   const [remainingTime, setRemainingTime] = useState(timeout);
   useEffect(() => {
     const interval = setInterval(() => {

@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import QUESTIONS from "../question.js";
-import Quiz_Complete from "../assets/quiz-complete.png";
 import Question from "./Question.jsx";
+import Summary from "./Summary.jsx";
 export default function Quiz() {
   const [userAnswers, setUserAnswers] = useState([]);
   const activeQuestionIndex = userAnswers.length;
@@ -9,19 +9,21 @@ export default function Quiz() {
   const handleSelectAnswer = useCallback(function handleSelectAnswer(
     selectedAnswer
   ) {
+    console.log("run here");
     setUserAnswers((prevState) => [...prevState, selectedAnswer])
   },
-  [activeQuestionIndex]);
+    [activeQuestionIndex]);
   const handleSkipQuestion = useCallback(() => {
+    console.log("it skip")
     handleSelectAnswer(null);
   }, [handleSelectAnswer]);
+  function handleRestart() {
+    setUserAnswers([]);
+  }
   const quizIsOver = activeQuestionIndex === QUESTIONS.length;
   if (quizIsOver) {
     return (
-      <div id="summary">
-        <img src={Quiz_Complete} alt="Quiz Completed" />
-        <h2>Quiz Completed!</h2>
-      </div>
+      <Summary userAnswers={userAnswers} onRestart={handleRestart}/>
     );
   }
 
@@ -29,12 +31,12 @@ export default function Quiz() {
     <>
       <div id="quiz">
         <div id="question">
-            <Question
-                key={activeQuestionIndex}
-                activeQuestionIndex={activeQuestionIndex}
-                onSelectAnswer={handleSelectAnswer}
-                onSkipQuestion={handleSkipQuestion}
-            />
+          <Question
+            key={activeQuestionIndex}
+            activeQuestionIndex={activeQuestionIndex}
+            onSelectAnswer={handleSelectAnswer}
+            onSkipQuestion={handleSkipQuestion}
+          />
         </div>
       </div>
     </>

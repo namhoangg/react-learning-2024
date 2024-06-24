@@ -1,74 +1,49 @@
 import QuestionTimer from "./QuestionTimer.jsx";
 import QUESTIONS from "../question.js";
 import { useState, useEffect, useRef } from "react";
+import Answer from "./Answer.jsx";
 export default function Question({
   activeQuestionIndex,
   onSelectAnswer,
   onSkipQuestion,
 }) {
-  const suffleAnswer = useRef();
+  let timer = 10000;
+  
   const [answer, setAnswer] = useState({
     selectedAnswer: "",
     isCorrect: null,
   });
-  if (!suffleAnswer.current) {
-    suffleAnswer.current = [...QUESTIONS[activeQuestionIndex].answers].sort(
-      () => Math.random() - 0.5
-    );
+  console.log(answer);
+  if (answer.selectedAnswer) {
+    timer = 1000;
   }
+  if (answer.isCorrect !== null) {
+    timer = 2000;
+  }
+ 
   function handleSelectAnswer(selectedAnswer) {
-    setAnswer({
-      selectedAnswer: selectedAnswer,
-      isCorrect: null,
-    });
+    // Get the current date and time
+    setAnswer((prevAnswer) => {
+      return { ...prevAnswer, selectedAnswer: selectedAnswer }
+    })
     setTimeout(() => {
-      setAnswer({
-        selectedAnswer: selectedAnswer,
-        isCorrect:selectedAnswer === QUESTIONS[activeQuestionIndex].answers[0],
-      });
+      setAnswer((prevAnswer) => {
+        return { ...prevAnswer, isCorrect: selectedAnswer === QUESTIONS[activeQuestionIndex].answers[0] }
+      })
       setTimeout(() => {
         onSelectAnswer(selectedAnswer);
-      }, 1000);
+      }, 2000);
     }, 1000);
-
-    // setTimeout(()=>{
-    //     onSelectAnswer(selectedAnswer);
-    // },2000)
   }
-  function handleSkipQuestion() {}
   return (
     <>
       <QuestionTimer
-        key={activeQuestionIndex}
-        timeout={10000}
-        onTimeout={onSkipQuestion}
+        key={timer}
+        timeout={timer}
+        onTimeout={answer.selectedAnswer === '' ? onSkipQuestion : null}
       />
       <h2>{QUESTIONS[activeQuestionIndex].text}</h2>
-      <ul id="answers">
-        {suffleAnswer.current.map((ans, index) => {
-          let cssClass = "";
-          if (ans === answer.selectedAnswer && answer.isCorrect === null) {
-            cssClass = "selected";
-          }
-          if (ans == answer.selectedAnswer && answer.isCorrect === true) {
-            cssClass = "correct";
-          }
-          if (ans == answer.selectedAnswer && answer.isCorrect === false) {
-            cssClass = "wrong";
-          }
-          return (
-            <li key={index} className="answer">
-              <button
-                onClick={() => handleSelectAnswer(ans)}
-                className={cssClass}
-                disabled={answer.selectedAnswer?true:false}
-              >
-                {ans}
-              </button>
-            </li>
-          );
-        })}
-      </ul>
+      <Answer answers={QUESTIONS[activeQuestionIndex].answers} onSelect={handleSelectAnswer} selectedAnswer={answer.selectedAnswer} isCorrect={answer.isCorrect}/>
     </>
   );
 }
